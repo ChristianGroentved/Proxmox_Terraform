@@ -103,14 +103,14 @@ terraform version
 ## 2. install Terraform provider
 The terraform provider is not a default one, but a 3rd party provider. This can be installed in the following manner
 
-create a directory terrraform-blog and tow files main.tf and vars.rf
+create a directory terrraform-blog and three files main.tf, vars.rf and providers.tf
 ```shell
 mkdir terraform-blog && cd terraform-blog
-touch main.tf vars.tf
+touch main.tf vars.tf providers.tf
 ```
-Main content goes in main.tf and variables will go in vars.tf. First we will add the bare minimum. We need to tell Terraform to use a provider, which is the term they use for the connector to the entity Terraform will be interacting with. Since we are using Proxmox we need to use the Proxmox provider. We just need to specify the name and version, then Terraform grabs it from github and installs it. I have used the[Telmate Proxmox provider](https://github.com/Telmate/terraform-provider-proxmox)
+The main logic of Terraform, will go imto main.tf. Info and parameters will go into providers.tf. Finally variables will go in vars.tf. First we will add the bare minimum. We need to tell Terraform to use a provider, which is the term they use for the connector to the entity Terraform will be interacting with. Since we are using Proxmox we need to use the Proxmox provider. We just need to specify the name and version, then Terraform grabs it from github and installs it. I have used the[Telmate Proxmox provider](https://github.com/Telmate/terraform-provider-proxmox)
 ```shell
-vim main.tf
+vim provider.tf
 ```
 ```shell
 terraform {
@@ -128,3 +128,37 @@ Save the file, an optinal step is to use the fmt command from Terraform, which r
 terraform fmt main.tf
 ```
 Now we can perform a Terraform init to initialize our plan. Which will force it to go out and grab the provider. If everthing is in ordre we will be informed that the provider installed and that Terraform has been initialized.
+
+```shell
+terraform init
+```
+## 3. Configure Proxmox provider
+First we comfigure the connection settings for Proxmox. To improve readability we keep the variables in the vars.tf file and info on provider in provider.tf. First we start with the vars.tf 
+
+```shell
+variable "pm_api_url" {
+  default = "https://"ip of your proxmox server":8006/api2/json"
+}
+
+variable "pm_user" {
+default = "root@pam"
+}
+
+variable "pm_password" {
+default = "my_password"
+}
+```
+Add the following to the provider.tf file
+```shell
+provider "proxmox" {
+  pm_parallel       = 1
+  pm_tls_insecure   = true
+  pm_api_url        = var.pm_api_url
+  pm_password       = var.pm_password
+  pm_user           = var.pm_user
+}
+```
+## Configure the virtuel machines
+
+
+
