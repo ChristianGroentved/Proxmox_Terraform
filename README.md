@@ -112,7 +112,7 @@ touch main.tf vars.tf providers.tf
 The main logic of Terraform, will go imto main.tf. Info and parameters will go into providers.tf. Finally variables will go in vars.tf. First we will add the bare minimum. We need to tell Terraform to use a provider, which is the term they use for the connector to the entity Terraform will be interacting with. Since we are using Proxmox we need to use the Proxmox provider. We just need to specify the name and version, then Terraform grabs it from github and installs it. I have used the[Telmate Proxmox provider](https://github.com/Telmate/terraform-provider-proxmox)
 
 ```shell
-vim provider.tf
+vim providers.tf
 ```
 
 ```shell
@@ -137,7 +137,7 @@ Now we can perform a Terraform init to initialize our plan. Which will force it 
 terraform init
 ```
 ## 3. Configure Proxmox provider
-First we comfigure the connection settings for Proxmox. To improve readability we keep the variables in the vars.tf file and info on provider in provider.tf. First we start with the vars.tf 
+First we comfigure the connection settings for Proxmox. To improve readability we keep the variables in the vars.tf file and info on provider in providers.tf. First we start with the vars.tf 
 
 ```shell
 variable "pm_api_url" {
@@ -153,7 +153,7 @@ default = "my_password"
 }
 ```
 
-Add the following to the provider.tf file
+Add the following to the providers.tf file
 
 ```shell
 provider "proxmox" {
@@ -181,6 +181,7 @@ The "ignore changes" lifecycle block is necessary, because Terraform likes to ch
 ```shell
 resource "proxmox_vm_qemu" "k3s_server" {
   count             = 1
+  # The count.index appends the index number to the string, this can be used like in this case, but also for creating ip adresses
   name              = "kubernetes-master-${count.index}"
   target_node       = "proxmox"
 
