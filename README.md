@@ -187,10 +187,10 @@ resource "proxmox_vm_qemu" "k3s_server" {
   clone             = "ubuntu-2004-cloudinit-template"
 
   os_type           = "cloud-init"
-  cores             = 4
+  cores             = 2
   sockets           = "1"
   cpu               = "host"
-  memory            = 1024
+  memory            = 2048
   scsihw            = "virtio-scsi-pci"
   bootdisk          = "scsi0"
 
@@ -231,10 +231,10 @@ resource "proxmox_vm_qemu" "k3s_agent" {
   clone             = "ubuntu-2004-cloudinit-template"
 
   os_type           = "cloud-init"
-  cores             = 4
+  cores             = 2
   sockets           = "1"
   cpu               = "host"
-  memory            = 1024
+  memory            = 2048
   scsihw            = "virtio-scsi-pci"
   bootdisk          = "scsi0"
 
@@ -275,10 +275,10 @@ resource "proxmox_vm_qemu" "storage" {
   clone             = "ubuntu-2004-cloudinit-template"
 
   os_type           = "cloud-init"
-  cores             = 4
+  cores             = 2
   sockets           = "1"
   cpu               = "host"
-  memory            = 1024
+  memory            = 2048
   scsihw            = "virtio-scsi-pci"
   bootdisk          = "scsi0"
 
@@ -312,4 +312,22 @@ resource "proxmox_vm_qemu" "storage" {
 }
 ```
 
+## Add ssh-pubkey for Cloud-Init
+To get passwordless login (useful for tools like Ansible), create a variable with your ssh_key in the vars.tf file.
+
+```shell
+variable "ssh_key" {
+  default = "ssh-rsa ..."
+}
+```
+
+## Deployment time
+Terraform has a simple but powerful deployment cycle, which consists of the following steps:
+
+* Init - Initializes the Terraform project and install needed plugins, dependencies...
+* Validate - Validates the syntax of the created Terraform .tf files
+* Plan - Calculates the steps and changes to install/upgrade your infrastructure
+* Apply - Applies the changes on the configured systems
+
+If you try to skip a step for example start with terraform plan, Terraform inform you to initialize the project first:
 
