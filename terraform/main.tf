@@ -5,19 +5,20 @@ resource "proxmox_vm_qemu" "k3s_server" {
 
   clone = "ubuntu-2004-cloudinit-template"
 
+  agent    = 1
   os_type  = "cloud-init"
   cores    = 2
-  sockets  = "1"
+  sockets  = 1
   cpu      = "host"
   memory   = 2048
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
 
   disk {
-    size         = 20
+    slot         = 0
+    size         = "20G"
     type         = "scsi"
     storage      = "local-lvm"
-    storage_type = "lvm"
     iothread     = 1
   }
 
@@ -47,19 +48,20 @@ resource "proxmox_vm_qemu" "k3s_agent" {
 
   clone = "ubuntu-2004-cloudinit-template"
 
+  agent    = 1
   os_type  = "cloud-init"
   cores    = 2
-  sockets  = "1"
+  sockets  = 1
   cpu      = "host"
   memory   = 2048
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
 
   disk {
-    size         = 20
+    slot         = 0
+    size         = "20G"
     type         = "scsi"
     storage      = "local-lvm"
-    storage_type = "lvm"
     iothread     = 1
   }
 
@@ -89,19 +91,20 @@ resource "proxmox_vm_qemu" "storage" {
 
   clone = "ubuntu-2004-cloudinit-template"
 
+  agent    = 1
   os_type  = "cloud-init"
   cores    = 2
-  sockets  = "1"
+  sockets  = 1
   cpu      = "host"
   memory   = 2048
   scsihw   = "virtio-scsi-pci"
   bootdisk = "scsi0"
 
   disk {
-    size         = 20
+    slot         = 0
+    size         = "20G"
     type         = "scsi"
     storage      = "local-lvm"
-    storage_type = "lvm"
     iothread     = 1
   }
 
