@@ -104,12 +104,12 @@ terraform version
 ## 2. install Terraform provider
 The terraform provider is not a default one, but a 3rd party provider. This can be installed in the following manner
 
-create a directory terrraform-blog and three files main.tf, vars.rf and providers.tf
+create a directory terrraform-blog and four files main.tf, secret.tfvars, providers.tf and vars.tf
 ```shell
 mkdir terraform-blog && cd terraform-blog
-touch main.tf vars.tf providers.tf
+touch main.tf secret.tfvars providers.tf vars.tf
 ```
-The main logic of Terraform, will go imto main.tf. Info and parameters will go into providers.tf. Finally variables will go in vars.tf. First we will add the bare minimum. We need to tell Terraform to use a provider, which is the term they use for the connector to the entity Terraform will be interacting with. Since we are using Proxmox we need to use the Proxmox provider. We just need to specify the name and version, then Terraform grabs it from github and installs it. I have used the[Telmate Proxmox provider](https://github.com/Telmate/terraform-provider-proxmox)
+The main logic of Terraform, will go imto main.tf. Info and parameters will go into providers.tf. Finally variables will go in secret.tfvars. First we will add the bare minimum. We need to tell Terraform to use a provider, which is the term they use for the connector to the entity Terraform will be interacting with. Since we are using Proxmox we need to use the Proxmox provider. We just need to specify the name and version, then Terraform grabs it from github and installs it. I have used the[Telmate Proxmox provider](https://github.com/Telmate/terraform-provider-proxmox)
 
 ```shell
 vim providers.tf
@@ -137,19 +137,26 @@ Now we can perform a Terraform init to initialize our plan. Which will force it 
 terraform init
 ```
 ## 3. Configure Proxmox provider
-First we comfigure the connection settings for Proxmox. To improve readability we keep the variables in the vars.tf file and info on provider in providers.tf. First we start with the vars.tf 
+First we configure the connection settings for Proxmox. To improve readability we keep the variables in the vars.tf file, info on provider in providers.tf and sensitive information in secret.tfvars. Additional the secret.tfvars file will not be committed to git 
 
 ```shell
 variable "pm_api_url" {
+  type    = string
+  description = "The address of the Proxmox server"
   default = "https://"ip of your proxmox server":8006/api2/json"
+  sensitive = true
 }
 
 variable "pm_user" {
-default = "root@pam"
+type    = string
+description = "The Proxmox user"
+sensitive = true
 }
 
 variable "pm_password" {
-default = "my_password"
+type = string
+description = "Proxmox user password"
+sensitive = true
 }
 ```
 
@@ -164,6 +171,13 @@ provider "proxmox" {
   pm_user           = var.pm_user
 }
 ```
+Add the following to the secret.tfvars file
+
+```shell
+pm_user = "root@pam"
+pm_password = "my_password"
+```
+As is evident, no default for pm_user and pm_password has been set, they er however mentioned in the secret.tfvars file. It is good practice to seprate the sensitve information into a .tfvars file. 
 
 ## Configure the virtuel machines
 Next we are going to configure our k3s-cluster server In this part you will have to adept the following parameters to your configuration.
@@ -318,6 +332,7 @@ To get passwordless login (useful for tools like Ansible), create a variable wit
 
 ```shell
 variable "ssh_key" {
+  type = string
   default = "ssh-rsa ..."
 }
 ```
@@ -331,4 +346,10 @@ Terraform has a simple but powerful deployment cycle, which consists of the foll
 * Apply - Applies the changes on the configured systems
 
 If you try to skip a step for example start with terraform plan, Terraform inform you to initialize the project first:
+
+when running terraform apply you need to add -var-file parameter to ensure
+
+```shell
+terraform apply -var-file="secret.tfvars"
+```
 
