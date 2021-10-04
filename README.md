@@ -352,4 +352,16 @@ when running terraform apply you need to add -var-file parameter to ensure
 ```shell
 terraform apply -var-file="secret.tfvars"
 ```
+## Login 
+You should now be able to log into the newly created instances, using the following
 
+```shell
+ssh ubunut@ip_address
+```
+On my mac I got a permession denied (publickey), when I tried to log in the first time. In my case it was a error related to user permessions, and the following commands allowed me to login
+
+```shell
+chown -R your_user: ~/.ssh
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/*
+```
