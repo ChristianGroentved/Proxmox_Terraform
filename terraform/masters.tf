@@ -1,5 +1,5 @@
-resource "proxmox_vm_qemu" "kube-worker" {
-  for_each = var.workers
+resource "proxmox_vm_qemu" "kube-master" {
+  for_each = var.masters
 
   name        = each.key
   target_node = each.value.target_node
@@ -18,17 +18,16 @@ resource "proxmox_vm_qemu" "kube-worker" {
     tag      = 40
     firewall = true
   }
-  network {
+   network {
     model    = "virtio"
     bridge   = "vmbr1"
   }
   disk {
     type    = "scsi"
-    storage = "rust-pool"
+    storage = "local-lvm"
     size    = each.value.disk
-    format  = "raw"
-    ssd     = 1
-    discard = "on"
+    slot = 0
+    iothread = 1
   }
   serial {
     id = 0
@@ -38,10 +37,7 @@ resource "proxmox_vm_qemu" "kube-worker" {
   scsihw       = "virtio-scsi-pci"
   os_type      = "cloud-init"
   ipconfig0    = "ip=${each.value.cidr},gw=${each.value.gw}"
-  ipconfig1    = "ip=${each.value.ceph_cidr}"
   ciuser       = "ubuntu"
   cipassword   = data.sops_file.secrets.data["k8s.user_password"]
-  searchdomain = var.common.search_domain
-  nameserver   = var.common.nameserver
   sshkeys      = data.sops_file.secrets.data["k8s.ssh_key"]
 }

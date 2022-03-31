@@ -1,129 +1,24 @@
-resource "proxmox_vm_qemu" "k3s_server" {
-  count       = 1
-  name        = "kubernetes-master-${count.index}"
-  target_node = "proxmox"
+terraform {
+  required_version = ">= 0.13.0"
 
-  clone = "ubuntu-2004-cloudinit-template"
+  required_providers {
+    proxmox = {
+      source = "Telmate/proxmox"
+      version = "2.9.0"
+    }
 
-  agent    = 1
-  os_type  = "cloud-init"
-  cores    = 2
-  sockets  = 1
-  cpu      = "host"
-  memory   = 2048
-  scsihw   = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-
-  disk {
-    slot         = 0
-    size         = "20G"
-    type         = "scsi"
-    storage      = "local-lvm"
-    iothread     = 1
+    sops = {
+      source = "carlpett/sops"
+      version = "0.6.3"
+    }
   }
-
-  network {
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      network,
-    ]
-  }
-
-  # Cloud Init Settings
-  ipconfig0 = "ip=192.168.1.${count.index + 3}/24,gw=192.168.1.1"
-
-  sshkeys = <<EOF
-  ${var.ssh_key}
-  EOF
 }
 
-resource "proxmox_vm_qemu" "k3s_agent" {
-  count       = 2
-  name        = "kubernetes-node-${count.index}"
-  target_node = "proxmox"
-
-  clone = "ubuntu-2004-cloudinit-template"
-
-  agent    = 1
-  os_type  = "cloud-init"
-  cores    = 2
-  sockets  = 1
-  cpu      = "host"
-  memory   = 2048
-  scsihw   = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-
-  disk {
-    slot         = 0
-    size         = "20G"
-    type         = "scsi"
-    storage      = "local-lvm"
-    iothread     = 1
-  }
-
-  network {
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      network,
-    ]
-  }
-
-  # Cloud Init Settings
-  ipconfig0 = "ip=192.168.1.${count.index + 4}/24,gw=192.168.1.1"
-
-  sshkeys = <<EOF
-  ${var.ssh_key}
-  EOF
+provider "proxmox" {
+    pm_tls_insecure = true
+    pm_api_url = "https://192.168.1.2:8006/api2/json"
+    pm_user = "root@pam"
+    pm_parallel = 4
 }
 
-resource "proxmox_vm_qemu" "storage" {
-  count       = 1
-  name        = "storage-node-${count.index}"
-  target_node = "proxmox"
-
-  clone = "ubuntu-2004-cloudinit-template"
-
-  agent    = 1
-  os_type  = "cloud-init"
-  cores    = 2
-  sockets  = 1
-  cpu      = "host"
-  memory   = 2048
-  scsihw   = "virtio-scsi-pci"
-  bootdisk = "scsi0"
-
-  disk {
-    slot         = 0
-    size         = "20G"
-    type         = "scsi"
-    storage      = "local-lvm"
-    iothread     = 1
-  }
-
-  network {
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      network,
-    ]
-  }
-
-  # Cloud Init Settings
-  ipconfig0 = "ip=192.168.1.${count.index + 6}/24,gw=192.168.1.1"
-
-  sshkeys = <<EOF
-  ${var.ssh_key}
-  EOF
-}
-
+provider "sops" {}
