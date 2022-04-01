@@ -7,12 +7,15 @@
 `apt-get install libguestfs-tools`
 
 ### Install qemu-guest-agent on Ubuntu image.
-`virt-customize -a focal-server-cloudimg-amd64.img --install qemu-guest-agent`
-
+```sh
+virt-customize -a focal-server-cloudimg-amd64.img --install qemu-guest-agent
+```
+<!-- 
 ### Enable password authentication in the template. Obviously, not recommended for except for testing.
-`virt-customize -a focal-server-cloudimg-amd64.img --run-command "sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"`
+`virt-customize -a focal-server-cloudimg-amd64.img --run-command "sed -i 's/.*PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config"` -->
 
 ### Set environment variables. Change these as necessary.
+If installing on multiple nodes that do not have shared storage, change `VM_ID` on one of them.
 ```sh
 export STORAGE_POOL="local-lvm"
 export VM_ID="10000"
