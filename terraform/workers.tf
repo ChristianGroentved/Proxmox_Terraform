@@ -18,10 +18,6 @@ resource "proxmox_vm_qemu" "kube-worker" {
     tag      = 40
     firewall = true
   }
-  network {
-    model    = "virtio"
-    bridge   = "vmbr1"
-  }
   disk {
     type    = "scsi"
     storage = "local-lvm"
