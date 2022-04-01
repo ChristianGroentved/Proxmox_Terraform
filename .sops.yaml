@@ -1,0 +1,5 @@
+---
+creation_rules:
+  - encrypted_regex: "^(k8s)$"
+    age: >-
+      age1jdapdgc8jy47q354dmp9988fpl26xfvjknglp3r7ska0q8wpcsgq8vd96v
