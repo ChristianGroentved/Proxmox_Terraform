@@ -22,7 +22,6 @@ resource "proxmox_vm_qemu" "kube-master" {
     type    = "scsi"
     storage = "local-lvm"
     size    = each.value.disk
-    slot = 0
     iothread = 1
   }
   serial {
