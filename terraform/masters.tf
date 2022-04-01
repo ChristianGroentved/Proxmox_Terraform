@@ -15,7 +15,6 @@ resource "proxmox_vm_qemu" "kube-master" {
     model    = "virtio"
     macaddr  = each.value.macaddr
     bridge   = "vmbr0"
-    tag      = 40
     firewall = true
   }
   disk {
